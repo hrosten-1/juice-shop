@@ -1,4 +1,5 @@
 node {
+    
     stage('Clone Repository') {
         checkout scm
     }  
@@ -14,4 +15,11 @@ node {
       archiveArtifacts allowEmptyArchive: true, artifacts: '**/dependency-check-report.*', onlyIfSuccessful: true
       step([$class: 'DependencyCheckPublisher', unstableTotalAll: '0'])
     }
+    
+    stage('SonarQube analysis') {
+    def scannerHome = tool 'sonarqubeScanner';
+    withSonarQubeEnv('sonarqubeServer') {
+      sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=hrostenpipeline -Dsonar.sources=./routes -Dsonar.host.url=http://10.48.253.181:9000 -Dsonar.login=d62a31f8ae0f6e6fd2482f07e80611edc1fc03f6"
+    }
+  }
 }
